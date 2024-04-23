@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define row1 2 
 #define column1 2 
@@ -34,15 +35,14 @@ int main()
 
 	int m2[row2][column2] = { { 1, 1, 1 }, { 2, 2, 2 } };
 
-    struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC, &start);
+    clock_t t;
+    t = clock();
 
     multiplyMatrix(m1, m2);
 
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    double time_taken = (end.tv_sec - start.tv_sec) * 1e9;
-    time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9; 
+    t = clock() - t;
+    double time_taken = ((double)t)/CLOCKS_PER_SEC;
 	
-    printf(time_taken);
+    printf("%lf",time_taken);
 	return 0;
 }
