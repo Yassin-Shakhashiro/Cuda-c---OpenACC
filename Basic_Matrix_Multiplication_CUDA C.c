@@ -1,6 +1,6 @@
 #include <cuda.h>
 #include <stdio.h>
-
+#include <time.h>
 __global__ void matrixMulBasic(float *A, float *B, float *C, int mat_width) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
@@ -37,11 +37,15 @@ int main() {
     cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
 
-    dim3 dimBlock(TILE_mat_width, TILE_mat_width);
-    dim3 dimGrid((mat_width + TILE_mat_width - 1) / TILE_mat_width, (mat_width + TILE_mat_width - 1) / TILE_mat_width);
-
-    matrixMulTiled<<<dimGrid, dimBlock>>>(d_A, d_B, d_C, mat_width);
-
+    dim3 dimBlock(mat_width, mat_width);
+    dim3 dimGrid((mat_width + mat_width - 1) / mat_width, (mat_width + mat_width - 1) / mat_width);
+    clock_t t;
+    t = clock();
+    matrixMulBasic<<<dimGrid, dimBlock>>>(d_A, d_B, d_C, mat_width);
+    t = clock() - t;
+    double time_taken = ((double)t)/CLOCKS_PER_SEC;
+	
+    printf("%lf",time_taken);
     cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
 
     cudaFree(d_A); cudaFree(d_B); cudaFree(d_C);
